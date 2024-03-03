@@ -26,17 +26,41 @@ from gi.repository import Gtk
 
 from sugar3.graphics.style import GRID_CELL_SIZE
 
+
 import pygame
 pygame.init()
+from home import Home
+from utility import Utility
 
 class ThreeUtilities:
     def __init__(self):
         pygame.display.init()
         pygame.display.set_caption('Three Utilities')
         self.clock = pygame.time.Clock()
+        self.reset()
+    
+    def reset(self):
+        self.screen = pygame.display.get_surface()
+        if not self.screen:
+            self.screen = pygame.display.set_mode((800, 600))
+        w, h = self.screen.get_width(), self.screen.get_height()
+
+        self.homes = [Home(w/2 - 200, h/2 + 100), Home(w/2, h/2 + 100), Home(w/2 + 200, h/2 + 100)]
+        self.water = Utility(w/2 - 200, h/2 - 100, "water", "blue")
+        self.elec = Utility(w/2, h/2 - 100, "electricity", "yellow")
+        self.gas = Utility(w/2 + 200, h/2 - 100, "gas", "green")
+        self.utilities = [self.water, self.elec, self.gas]
+    
+    def draw(self):
+        self.screen.fill("white")
+        for home in self.homes:
+            home.update(self.py_events)
+            self.screen.blit(home.image, home.rect)
+        for util in self.utilities:
+            util.update(self.py_events)
+            self.screen.blit(util.image, util.rect)
 
     def run(self):
-        self.screen = pygame.display.get_surface()
         self.is_running = True
 
         while self.is_running:
@@ -49,7 +73,10 @@ class ThreeUtilities:
                     self.is_running = False
                 elif event.type == pygame.VIDEORESIZE:
                     self.screen = pygame.display.set_mode((event.size[0], event.size[1]),pygame.RESIZABLE)
+                    self.reset()
             
+            self.draw()
+    
             pygame.display.update()
             self.clock.tick(30)
 
