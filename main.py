@@ -37,9 +37,6 @@ class ThreeUtilities:
         pygame.display.init()
         pygame.display.set_caption('Three Utilities')
         self.clock = pygame.time.Clock()
-        self.originate = None
-        self.line_start = None
-        self.lines = []
         self.reset()
     
     def reset(self):
@@ -48,11 +45,17 @@ class ThreeUtilities:
             self.screen = pygame.display.set_mode((800, 600))
         w, h = self.screen.get_width(), self.screen.get_height()
 
-        self.homes = [Home(w/2 - 200, h/2 + 100), Home(w/2, h/2 + 100), Home(w/2 + 200, h/2 + 100)]
         self.water = Utility(w/2 - 200, h/2 - 100, "water", "blue")
         self.elec = Utility(w/2, h/2 - 100, "electricity", "red")
         self.gas = Utility(w/2 + 200, h/2 - 100, "gas", "green")
         self.utilities = [self.water, self.elec, self.gas]
+        self.homes = [Home(w/2 - 200, h/2 + 100, self.utilities), Home(w/2, h/2 + 100, self.utilities), Home(w/2 + 200, h/2 + 100, self.utilities)]
+    
+        self.originate = None
+        self.line_start = None
+        self.lines = []
+
+        self.collision_point = None
     
     def draw(self):
         self.screen.fill("white")
@@ -68,9 +71,62 @@ class ThreeUtilities:
         for home in self.homes:
             home.update(self.py_events)
             self.screen.blit(home.image, home.rect)
+            cxs = [2 + home.rect.centerx - 16, 2 + home.rect.centerx, 2 + home.rect.centerx + 16]
+            i = 0
+            for util in home.connected:
+                pygame.draw.circle(self.screen, util.color, (cxs[i], home.rect.bottom + 15), 5, 2 if not home.connected[util] else 0)
+                i += 1
+
         for util in self.utilities:
             util.update(self.py_events)
             self.screen.blit(util.image, util.rect)
+        
+        if self.collision_point:
+            pygame.draw.circle(self.screen, "red", self.collision_point, 5)
+    
+    def lineLineIntersect(self, P0, P1, Q0, Q1):  
+        d = (P1[0]-P0[0]) * (Q1[1]-Q0[1]) + (P1[1]-P0[1]) * (Q0[0]-Q1[0]) 
+        if d == 0:
+            return None
+        t = ((Q0[0]-P0[0]) * (Q1[1]-Q0[1]) + (Q0[1]-P0[1]) * (Q0[0]-Q1[0])) / d
+        u = ((Q0[0]-P0[0]) * (P1[1]-P0[1]) + (Q0[1]-P0[1]) * (P0[0]-P1[0])) / d
+        if 0 <= t <= 1 and 0 <= u <= 1:
+            return round(P1[0] * t + P0[0] * (1-t)), round(P1[1] * t + P0[1] * (1-t))
+        return None
+
+    def segment_intersect(self, line1, line2) :
+        intersection_pt = self.lineLineIntersect(line1[0], line1[1], line2[0], line2[1])
+
+        if not intersection_pt:
+            return None
+    
+        if intersection_pt[0] < min(line1[0][0], line1[1][0]) or intersection_pt[0] > max(line1[0][0], line1[1][0]):
+            return None
+        if intersection_pt[0] < min(line2[0][0], line2[1][0]) or intersection_pt[0] > max(line2[0][0], line2[1][0]):
+            return None
+
+        return intersection_pt    
+
+    def lines_collide(self, ts, te, os, oe, originating, terminating):
+        intersect_point = self.segment_intersect((ts, te), (os, oe))
+        if not intersect_point:
+            return False
+        if intersect_point == ts and originating:
+            return False
+        if intersect_point == te and terminating:
+            return False
+        
+        self.collision_point = intersect_point
+        return True
+        
+    
+    def check_collision(self, start, end, originating, terminating):
+        for i in range(len(self.lines) - 1):
+            line = self.lines[i]
+            for j in range(1, len(line) - 1):
+                if self.lines_collide(start, end, line[j], line[j + 1], originating, terminating):
+                    return True
+        return False
 
     def run(self):
         self.is_running = True
@@ -93,16 +149,23 @@ class ThreeUtilities:
                                 self.originate = util
                                 self.lines.append([util, util.rect.center]) # the first element of every line will store the utility where it starts from
                     else:
+                        self.collision_point = None
                         terminates = False
                         for home in self.homes:
                             if home.active:
-                                self.lines[-1].append(home.rect.center)
-                                self.originate = None
-                                self.line_start = None
                                 terminates = True
+                                if not self.check_collision(self.lines[-1][-1], home.rect.center, len(self.lines[-1]) == 2, terminates):
+                                    home.connected[self.originate] = True
+                                    self.lines[-1].append(home.rect.center)
+                                    self.originate = None
+                                    self.line_start = None
                         
                         if not terminates:
-                            self.lines[-1].append(pygame.mouse.get_pos())
+                            if not self.check_collision(self.lines[-1][-1], pygame.mouse.get_pos(), len(self.lines[-1]) == 2, terminates):
+                                self.lines[-1].append(pygame.mouse.get_pos())
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_r:
+                        self.reset()
             
             self.draw()
     
