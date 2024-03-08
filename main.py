@@ -30,6 +30,7 @@ import math
 from functools import cmp_to_key
 
 import pygame
+from pygame import mixer
 pygame.init()
 from home import Home
 from utility import Utility
@@ -37,6 +38,7 @@ from utility import Utility
 INS_FONT = pygame.font.SysFont('ubuntumono', 18, bold=True)
 ERROR_FONT = pygame.font.SysFont('ubuntumono', 24, bold=True)
 INSTRUCTIONS = ["R - Restart", "S - Stop line"]
+ACHIEVEMENT_SOUND = mixer.Sound('assets/sounds/bonus.mp3')
 
 class ThreeUtilities:
     def __init__(self):
@@ -62,6 +64,8 @@ class ThreeUtilities:
 
         self.err_message = None
         self.collision_point = None
+
+        self.new_connects = 0
     
     def draw(self):
         self.screen.fill("white")
@@ -176,6 +180,7 @@ class ThreeUtilities:
         if not self.check_collision(start, end, startNode, endNode):
             self.lines[-1].append(end)
             if endNode:
+                self.new_connects += 1
                 endNode.connected[self.originate] = True
             return True
         else:
@@ -185,6 +190,7 @@ class ThreeUtilities:
 
 
     def draw_lines(self, pos):
+        self.new_connects = 0
         self.collision_point = None
         self.err_message = None
         if not self.originate:
@@ -237,6 +243,8 @@ class ThreeUtilities:
                     self.reset()
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     self.draw_lines(pygame.mouse.get_pos())
+                    if self.new_connects > 0:
+                        ACHIEVEMENT_SOUND.play()
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_r:
                         self.reset()
