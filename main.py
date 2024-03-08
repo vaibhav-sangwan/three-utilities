@@ -34,6 +34,10 @@ pygame.init()
 from home import Home
 from utility import Utility
 
+INS_FONT = pygame.font.SysFont('ubuntumono', 18, bold=True)
+ERROR_FONT = pygame.font.SysFont('ubuntumono', 24, bold=True)
+INSTRUCTIONS = ["R - Restart", "S - Stop line"]
+
 class ThreeUtilities:
     def __init__(self):
         pygame.display.init()
@@ -54,9 +58,9 @@ class ThreeUtilities:
         self.homes = [Home(w/2 - 200, h/2 + 100, self.utilities), Home(w/2, h/2 + 100, self.utilities), Home(w/2 + 200, h/2 + 100, self.utilities)]
     
         self.originate = None
-        self.line_start = None
         self.lines = []
 
+        self.err_message = None
         self.collision_point = None
     
     def draw(self):
@@ -85,6 +89,18 @@ class ThreeUtilities:
         
         if self.collision_point:
             pygame.draw.circle(self.screen, "red", self.collision_point, 5)
+            error = ERROR_FONT.render(self.err_message, False, "red")
+            error_rect = error.get_rect(center = (self.screen.get_width()/2, self.screen.get_height() - 30))
+            self.screen.blit(error, error_rect)
+        
+        top = 10
+        for instruction in INSTRUCTIONS:
+            inst = INS_FONT.render(instruction, False, "black")
+            inst_rect = inst.get_rect(topleft = (10, top))
+            top += 20
+            self.screen.blit(inst, inst_rect)
+        
+        
     
     def lineLineIntersect(self, P0, P1, Q0, Q1):  
         d = (P1[0]-P0[0]) * (Q1[1]-Q0[1]) + (P1[1]-P0[1]) * (Q0[0]-Q1[0]) 
@@ -111,11 +127,13 @@ class ThreeUtilities:
 
     def lines_collide(self, ts, te, os, oe, originating, terminating):
         intersect_point = self.segment_intersect((ts, te), (os, oe))
-        if (ts, te) == (os, oe) or (ts, te) == (oe, os): # when the lines are coincident
-            self.collision_point = te
-            return True
         if terminating and terminating.connected[self.originate]: # when the line is connecting a suuply to already connected house
+            self.err_message = "Already Connected"
             self.collision_point = terminating.rect.center
+            return True
+        if (ts, te) == (os, oe) or (ts, te) == (oe, os): # when the lines are coincident
+            self.err_message = "Collision"
+            self.collision_point = te
             return True
         if not intersect_point:
             return False
@@ -125,6 +143,7 @@ class ThreeUtilities:
             return False
         
         self.collision_point = intersect_point
+        self.err_message = "Collision"
         return True
         
     
@@ -167,6 +186,7 @@ class ThreeUtilities:
 
     def draw_lines(self, pos):
         self.collision_point = None
+        self.err_message = None
         if not self.originate:
             for util in self.utilities:
                 if util.rect.collidepoint(pos):
@@ -219,7 +239,7 @@ class ThreeUtilities:
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_r:
                         self.reset()
-                    elif event.key == pygame.K_d:
+                    elif event.key == pygame.K_s:
                         self.originate = None
             
             self.draw()
