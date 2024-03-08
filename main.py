@@ -76,11 +76,11 @@ class ThreeUtilities:
 
         for home in self.homes:
             home.update(self.py_events)
-            self.screen.blit(home.image, (home.rect.left - 10, home.rect.top - 10))
-            cxs = [2 + home.rect.centerx - 16, 2 + home.rect.centerx, 2 + home.rect.centerx + 16]
+            self.screen.blit(home.image, (home.rect.left - 9, home.rect.top - 16))
+            cxs = [home.rect.centerx - 16, home.rect.centerx, home.rect.centerx + 16]
             i = 0
             for util in home.connected:
-                pygame.draw.circle(self.screen, util.color, (cxs[i], home.rect.bottom + 25), 5, 2 if not home.connected[util] else 0)
+                pygame.draw.circle(self.screen, util.color, (cxs[i], home.rect.bottom + 15), 5, 2 if not home.connected[util] else 0)
                 i += 1
 
         for util in self.utilities:
@@ -127,7 +127,7 @@ class ThreeUtilities:
 
     def lines_collide(self, ts, te, os, oe, originating, terminating):
         intersect_point = self.segment_intersect((ts, te), (os, oe))
-        if terminating and terminating.connected[self.originate]: # when the line is connecting a suuply to already connected house
+        if terminating and terminating.connected[self.originate]: # when the line is connecting a supply to already connected house
             self.err_message = "Already Connected"
             self.collision_point = terminating.rect.center
             return True
@@ -203,21 +203,22 @@ class ThreeUtilities:
                     nodes.append(home.rect.center)
                 if home.rect.collidepoint(pos):
                     terminates = True
-            
+            if not terminates:
+                nodes.append(pos)
+
             nodes = sorted(nodes, key=cmp_to_key(lambda x, y: self.dist(x, start) - self.dist(y, start)))
             
             prevNode = start
             i = 1
+            collided = False
             while i < len(nodes):
-                drawn = self.draw_line(prevNode, nodes[i])
+                collided = collided or not self.draw_line(prevNode, nodes[i])
                 prevNode = nodes[i]
-                if not drawn:
+                if collided:
                     break
                 i = i + 1
             
-            if not terminates:
-                self.draw_line(prevNode, pos)
-            elif drawn:
+            if terminates and not collided: # if the supply line is terminating but already collided, then originate should remain active instead of getting set to None
                 self.originate = None
 
     def run(self):
