@@ -26,6 +26,8 @@ from gi.repository import Gtk
 
 from sugar3.graphics.style import GRID_CELL_SIZE
 
+import math
+from functools import cmp_to_key
 
 import pygame
 pygame.init()
@@ -70,11 +72,11 @@ class ThreeUtilities:
 
         for home in self.homes:
             home.update(self.py_events)
-            self.screen.blit(home.image, home.rect)
+            self.screen.blit(home.image, (home.rect.left - 10, home.rect.top - 10))
             cxs = [2 + home.rect.centerx - 16, 2 + home.rect.centerx, 2 + home.rect.centerx + 16]
             i = 0
             for util in home.connected:
-                pygame.draw.circle(self.screen, util.color, (cxs[i], home.rect.bottom + 15), 5, 2 if not home.connected[util] else 0)
+                pygame.draw.circle(self.screen, util.color, (cxs[i], home.rect.bottom + 25), 5, 2 if not home.connected[util] else 0)
                 i += 1
 
         for util in self.utilities:
@@ -109,6 +111,12 @@ class ThreeUtilities:
 
     def lines_collide(self, ts, te, os, oe, originating, terminating):
         intersect_point = self.segment_intersect((ts, te), (os, oe))
+        if (ts, te) == (os, oe) or (ts, te) == (oe, os): # when the lines are coincident
+            self.collision_point = te
+            return True
+        if terminating and terminating.connected[self.originate]: # when the line is connecting a suuply to already connected house
+            self.collision_point = terminating.rect.center
+            return True
         if not intersect_point:
             return False
         if intersect_point == ts and originating:
@@ -120,13 +128,77 @@ class ThreeUtilities:
         return True
         
     
-    def check_collision(self, start, end, originating, terminating):
-        for i in range(len(self.lines) - 1):
+    def check_collision(self, start, end, startNode, endNode):
+        for i in range(len(self.lines)):
             line = self.lines[i]
             for j in range(1, len(line) - 1):
-                if self.lines_collide(start, end, line[j], line[j + 1], originating, terminating):
+                if i == len(self.lines) - 1 and j == len(line) - 2:
+                    continue
+                if self.lines_collide(start, end, line[j], line[j + 1], startNode, endNode):
                     return True
         return False
+
+    def dist(self, start, end):
+        return math.hypot(start[0]-end[0], start[1]-end[1])
+    
+    def draw_line(self, start, end):
+        startNode = None
+        endNode = None
+
+        for home in self.homes:
+            if start == home.rect.center:
+                startNode = home
+            if end == home.rect.center:
+                endNode = home
+        
+        if len(self.lines[-1]) == 2:
+            startNode = self.originate
+        
+        if not self.check_collision(start, end, startNode, endNode):
+            self.lines[-1].append(end)
+            if endNode:
+                endNode.connected[self.originate] = True
+            return True
+        else:
+            return False
+
+        
+
+
+    def draw_lines(self, pos):
+        self.collision_point = None
+        if not self.originate:
+            for util in self.utilities:
+                if util.rect.collidepoint(pos):
+                    self.originate = util
+                    self.lines.append([util, util.rect.center])
+        
+        else:
+            terminates = False
+            start = self.lines[-1][-1]
+            nodes = []
+            nodes.append(start)
+            for home in self.homes:
+                if home.rect.clipline(start[0], start[1], pos[0], pos[1]) and home.rect.center != start:
+                    nodes.append(home.rect.center)
+                if home.rect.collidepoint(pos):
+                    terminates = True
+            
+            nodes = sorted(nodes, key=cmp_to_key(lambda x, y: self.dist(x, start) - self.dist(y, start)))
+            
+            prevNode = start
+            i = 1
+            while i < len(nodes):
+                drawn = self.draw_line(prevNode, nodes[i])
+                prevNode = nodes[i]
+                if not drawn:
+                    break
+                i = i + 1
+            
+            if not terminates:
+                self.draw_line(prevNode, pos)
+            elif drawn:
+                self.originate = None
 
     def run(self):
         self.is_running = True
@@ -143,29 +215,12 @@ class ThreeUtilities:
                     self.screen = pygame.display.set_mode((event.size[0], event.size[1]),pygame.RESIZABLE)
                     self.reset()
                 elif event.type == pygame.MOUSEBUTTONDOWN:
-                    if not self.originate:
-                        for util in self.utilities:
-                            if util.active:
-                                self.originate = util
-                                self.lines.append([util, util.rect.center]) # the first element of every line will store the utility where it starts from
-                    else:
-                        self.collision_point = None
-                        terminates = False
-                        for home in self.homes:
-                            if home.active:
-                                terminates = True
-                                if not self.check_collision(self.lines[-1][-1], home.rect.center, len(self.lines[-1]) == 2, terminates):
-                                    home.connected[self.originate] = True
-                                    self.lines[-1].append(home.rect.center)
-                                    self.originate = None
-                                    self.line_start = None
-                        
-                        if not terminates:
-                            if not self.check_collision(self.lines[-1][-1], pygame.mouse.get_pos(), len(self.lines[-1]) == 2, terminates):
-                                self.lines[-1].append(pygame.mouse.get_pos())
+                    self.draw_lines(pygame.mouse.get_pos())
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_r:
                         self.reset()
+                    elif event.key == pygame.K_d:
+                        self.originate = None
             
             self.draw()
     

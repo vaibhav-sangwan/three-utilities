@@ -29,6 +29,10 @@ class Home(pygame.sprite.Sprite):
         self.connected = {util:False for util in utils}
 
         self.rect = self.image.get_rect(center = (x, y))
+        self.rect.width -= 20
+        self.rect.height -= 20
+        self.rect.left += 10
+        self.rect.top += 10
         self.active = False
  
 
