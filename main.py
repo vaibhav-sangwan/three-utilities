@@ -37,14 +37,17 @@ from utility import Utility
 
 INS_FONT = pygame.font.SysFont('ubuntumono', 18, bold=True)
 ERROR_FONT = pygame.font.SysFont('ubuntumono', 24, bold=True)
-INSTRUCTIONS = ["R - Restart", "S - Stop line"]
+INSTRUCTIONS = ["R - Restart", "S - Stop line", "M - Toggle Mute"]
 ACHIEVEMENT_SOUND = mixer.Sound('assets/sounds/bonus.mp3')
+WIN_SOUND = mixer.Sound('assets/sounds/win.mp3')
 
 class ThreeUtilities:
     def __init__(self):
         pygame.display.init()
         pygame.display.set_caption('Three Utilities')
         self.clock = pygame.time.Clock()
+        self.mute = False
+        self.sound_channel = mixer.find_channel(True)
         self.reset()
     
     def reset(self):
@@ -66,6 +69,9 @@ class ThreeUtilities:
         self.collision_point = None
 
         self.new_connects = 0
+        self.total_connects = 0
+
+        self.state = "running"
     
     def draw(self):
         self.screen.fill("white")
@@ -103,6 +109,11 @@ class ThreeUtilities:
             inst_rect = inst.get_rect(topleft = (10, top))
             top += 20
             self.screen.blit(inst, inst_rect)
+        
+        if self.state == "win":
+            win_msg = pygame.image.load("./assets/util-win.png")
+            win_msg_rect = win_msg.get_rect(center = (self.screen.get_width()/2, self.screen.get_height()/2))
+            self.screen.blit(win_msg, win_msg_rect)
         
         
     
@@ -186,9 +197,6 @@ class ThreeUtilities:
         else:
             return False
 
-        
-
-
     def draw_lines(self, pos):
         self.new_connects = 0
         self.collision_point = None
@@ -241,15 +249,25 @@ class ThreeUtilities:
                 elif event.type == pygame.VIDEORESIZE:
                     self.screen = pygame.display.set_mode((event.size[0], event.size[1]),pygame.RESIZABLE)
                     self.reset()
-                elif event.type == pygame.MOUSEBUTTONDOWN:
+                elif event.type == pygame.MOUSEBUTTONDOWN and self.state == "running":
                     self.draw_lines(pygame.mouse.get_pos())
-                    if self.new_connects > 0:
-                        ACHIEVEMENT_SOUND.play()
+                    self.total_connects += self.new_connects
+                    if self.total_connects >= 9:
+                        self.homes = []
+                        self.utilities = []
+                        self.lines = []
+                        self.state = "win"
+                        self.sound_channel.play(WIN_SOUND)
+                    elif self.new_connects > 0:
+                        self.sound_channel.play(ACHIEVEMENT_SOUND)
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_r:
                         self.reset()
                     elif event.key == pygame.K_s:
                         self.originate = None
+                    elif event.key == pygame.K_m:
+                        self.mute = not self.mute
+                        self.sound_channel.set_volume(0 if self.mute else 1)
             
             self.draw()
     
