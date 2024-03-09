@@ -35,12 +35,17 @@ from sugar3.activity.widgets import StopButton, ActivityToolbarButton
 import sugargame.canvas
 import main
 
+DESCRIPTION = """There are 3 houses in a town and 3 utilities - water, gas and electricity for which you have to lay down supply lines for. The supply lines must not intersect with each other. 
+Click on any of the utilities to start laying down the pipelines and click on a house to terminate the pipeline. Find a solution such that all houses are connected with all 3 utilities.
+"""
+
 class ThreeUtilitiesActivity(Activity):
 
     def __init__(self, handle):
         Activity.__init__(self, handle)
 
         self.game = main.ThreeUtilities()
+        self.metadata['description'] = DESCRIPTION
         
         self.build_toolbar()
         self._pygamecanvas = sugargame.canvas.PygameCanvas(self, main=self.game.run, modules=[pygame.display])
