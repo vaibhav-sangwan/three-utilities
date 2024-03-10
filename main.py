@@ -40,6 +40,7 @@ ERROR_FONT = pygame.font.SysFont('ubuntumono', 24, bold=True)
 INSTRUCTIONS = ["R - Restart", "S - Stop line", "M - Toggle Mute"]
 ACHIEVEMENT_SOUND = mixer.Sound('assets/sounds/bonus.mp3')
 WIN_SOUND = mixer.Sound('assets/sounds/win.mp3')
+UTILITIES = [("water", "blue"), ("electricity", "red"), ("gas", "green")]
 
 class ThreeUtilities:
     def __init__(self):
@@ -48,19 +49,25 @@ class ThreeUtilities:
         self.clock = pygame.time.Clock()
         self.mute = False
         self.sound_channel = mixer.find_channel(True)
-        self.reset()
+        self.level = 1
+        self.load_level(self.level)
     
-    def reset(self):
+    def load_level(self, level):
         self.screen = pygame.display.get_surface()
         if not self.screen:
             self.screen = pygame.display.set_mode((800, 600))
         w, h = self.screen.get_width(), self.screen.get_height()
 
-        self.water = Utility(w/2 - 200, h/2 - 100, "water", "blue")
-        self.elec = Utility(w/2, h/2 - 100, "electricity", "red")
-        self.gas = Utility(w/2 + 200, h/2 - 100, "gas", "green")
-        self.utilities = [self.water, self.elec, self.gas]
-        self.homes = [Home(w/2 - 200, h/2 + 100, self.utilities), Home(w/2, h/2 + 100, self.utilities), Home(w/2 + 200, h/2 + 100, self.utilities)]
+        self.utilities = []
+        mid = w/2
+        comp_wid = (level - 1) * 200
+        comp_start = mid - (comp_wid/2)
+        for i in range(1, level + 1):
+            self.utilities.append(Utility(comp_start + ((i - 1) * 200), h/2 - 100, UTILITIES[i - 1][0], UTILITIES[i - 1][1]))
+
+        self.homes = []
+        for i in range(1, level + 1):
+            self.homes.append(Home(comp_start + ((i - 1) * 200), h/2 + 100, self.utilities))
     
         self.originate = None
         self.lines = []
@@ -87,10 +94,13 @@ class ThreeUtilities:
         for home in self.homes:
             home.update(self.py_events)
             self.screen.blit(home.image, (home.rect.left - 9, home.rect.top - 16))
-            cxs = [home.rect.centerx - 16, home.rect.centerx, home.rect.centerx + 16]
+
+            circ_dist = 16
+            circ_wid = (len(home.connected) - 1) * circ_dist
+            circ_start = home.rect.centerx - (circ_wid/2)
             i = 0
             for util in home.connected:
-                pygame.draw.circle(self.screen, util.color, (cxs[i], home.rect.bottom + 15), 5, 2 if not home.connected[util] else 0)
+                pygame.draw.circle(self.screen, util.color, (circ_start + (i * circ_dist), home.rect.bottom + 15), 5, 2 if not home.connected[util] else 0)
                 i += 1
 
         for util in self.utilities:
@@ -248,21 +258,27 @@ class ThreeUtilities:
                     self.is_running = False
                 elif event.type == pygame.VIDEORESIZE:
                     self.screen = pygame.display.set_mode((event.size[0], event.size[1]),pygame.RESIZABLE)
-                    self.reset()
+                    self.load_level(self.level)
                 elif event.type == pygame.MOUSEBUTTONDOWN and self.state == "running":
                     self.draw_lines(pygame.mouse.get_pos())
                     self.total_connects += self.new_connects
-                    if self.total_connects >= 9:
-                        self.homes = []
-                        self.utilities = []
-                        self.lines = []
-                        self.state = "win"
+                    if self.total_connects >= (self.level ** 2):
                         self.sound_channel.play(WIN_SOUND)
+                        if self.level == 3:
+                            self.homes = []
+                            self.utilities = []
+                            self.lines = []
+                            self.state = "win"
+                        else:
+                            self.level += 1
+                            self.load_level(self.level)
                     elif self.new_connects > 0:
                         self.sound_channel.play(ACHIEVEMENT_SOUND)
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_r:
-                        self.reset()
+                        if self.state == "win":
+                            self.level = 1
+                        self.load_level(self.level)
                     elif event.key == pygame.K_s:
                         self.originate = None
                     elif event.key == pygame.K_m:
