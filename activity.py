@@ -20,8 +20,6 @@
 # Contact information:
 # Vaibhav Sangwan    sangwanvaibhav02@gmail.com
 
-from gettext import gettext as _
-
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
@@ -35,9 +33,15 @@ from sugar3.activity.widgets import StopButton, ActivityToolbarButton
 import sugargame.canvas
 import main
 
-DESCRIPTION = """There are 3 houses in a town and 3 utilities - water, gas and electricity for which you have to lay down supply lines for. The supply lines must not intersect with each other. 
-Click on any of the utilities to start laying down the pipelines and click on a house to terminate the pipeline. Find a solution such that all houses are connected with all 3 utilities.
+DESCRIPTION = """\
+There are 3 houses in a town and 3 utilities - water, gas and electricity \
+for which you have to lay down supply lines for. The supply lines must not \
+intersect with each other.
+Click on any of the utilities to start laying down the pipelines and click \
+on a house to terminate the pipeline. Find a solution such that all houses \
+are connected with all 3 utilities.
 """
+
 
 class ThreeUtilitiesActivity(Activity):
 
@@ -46,16 +50,20 @@ class ThreeUtilitiesActivity(Activity):
 
         self.game = main.ThreeUtilities()
         self.metadata['description'] = DESCRIPTION
-        
+
         self.build_toolbar()
-        self._pygamecanvas = sugargame.canvas.PygameCanvas(self, main=self.game.run, modules=[pygame.display])
+        self._pygamecanvas = sugargame.canvas.PygameCanvas(
+            self,
+            main=self.game.run,
+            modules=[pygame.display]
+        )
 
         self.set_canvas(self._pygamecanvas)
         self._pygamecanvas.grab_focus()
 
     def build_toolbar(self):
         toolbar_box = ToolbarBox()
-        
+
         activity_button = ActivityToolbarButton(self)
         toolbar_box.toolbar.insert(activity_button, 0)
         activity_button.show()

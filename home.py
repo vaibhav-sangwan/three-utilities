@@ -22,19 +22,19 @@
 
 import pygame
 
+
 class Home(pygame.sprite.Sprite):
     def __init__(self, x, y, utils):
         super().__init__()
         self.image = pygame.image.load('./assets/home.png')
-        self.connected = {util:False for util in utils}
+        self.connected = {util: False for util in utils}
 
-        self.rect = self.image.get_rect(center = (x, y))
+        self.rect = self.image.get_rect(center=(x, y))
         self.rect.width -= 18
         self.rect.height -= 18
         self.rect.left += 9
         self.rect.top += 16
         self.active = False
- 
 
     def update(self, py_events):
         for event in py_events:
