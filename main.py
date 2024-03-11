@@ -49,7 +49,7 @@ class ThreeUtilities:
         self.clock = pygame.time.Clock()
         self.mute = False
         self.sound_channel = mixer.find_channel(True)
-        self.level = 1
+        self.level = [1, 1]
         self.load_level(self.level)
     
     def load_level(self, level):
@@ -59,15 +59,20 @@ class ThreeUtilities:
         w, h = self.screen.get_width(), self.screen.get_height()
 
         self.utilities = []
+        utils, houses = level
         mid = w/2
-        comp_wid = (level - 1) * 200
-        comp_start = mid - (comp_wid/2)
-        for i in range(1, level + 1):
-            self.utilities.append(Utility(comp_start + ((i - 1) * 200), h/2 - 100, UTILITIES[i - 1][0], UTILITIES[i - 1][1]))
+        dist = 200
+
+        util_wid = (utils - 1) * dist
+        util_start = mid - (util_wid/2)
+        for i in range(1, utils + 1):
+            self.utilities.append(Utility(util_start + ((i - 1) * dist), h/2 - 100, UTILITIES[i - 1][0], UTILITIES[i - 1][1]))
 
         self.homes = []
-        for i in range(1, level + 1):
-            self.homes.append(Home(comp_start + ((i - 1) * 200), h/2 + 100, self.utilities))
+        house_wid = (houses - 1) * dist
+        house_start = mid - (house_wid/2)
+        for i in range(1, houses + 1):
+            self.homes.append(Home(house_start + ((i - 1) * dist), h/2 + 100, self.utilities))
     
         self.originate = None
         self.lines = []
@@ -120,6 +125,11 @@ class ThreeUtilities:
             top += 20
             self.screen.blit(inst, inst_rect)
         
+        if self.state == "running":
+            level_msg = ERROR_FONT.render("LEVEL " + str(self.level[0] + self.level[1] - (1 if self.level[0] == 1 else 0)), False, "black")
+            level_msg_rect = level_msg.get_rect(center = (self.screen.get_width()/2, 20))
+            self.screen.blit(level_msg, level_msg_rect)
+
         if self.state == "win":
             win_msg = pygame.image.load("./assets/util-win.png")
             win_msg_rect = win_msg.get_rect(center = (self.screen.get_width()/2, self.screen.get_height()/2))
@@ -262,22 +272,25 @@ class ThreeUtilities:
                 elif event.type == pygame.MOUSEBUTTONDOWN and self.state == "running":
                     self.draw_lines(pygame.mouse.get_pos())
                     self.total_connects += self.new_connects
-                    if self.total_connects >= (self.level ** 2):
+                    if self.total_connects >= self.level[0] * self.level[1]:
                         self.sound_channel.play(WIN_SOUND)
-                        if self.level == 3:
+                        if self.level[0] == 3:
                             self.homes = []
                             self.utilities = []
                             self.lines = []
                             self.state = "win"
                         else:
-                            self.level += 1
+                            self.level[1] += 1
+                            if(self.level[1] > 3):
+                                self.level[0] += 1
+                                self.level[1] = self.level[0]
                             self.load_level(self.level)
                     elif self.new_connects > 0:
                         self.sound_channel.play(ACHIEVEMENT_SOUND)
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_r:
                         if self.state == "win":
-                            self.level = 1
+                            self.level = [1, 1]
                         self.load_level(self.level)
                     elif event.key == pygame.K_s:
                         self.originate = None
