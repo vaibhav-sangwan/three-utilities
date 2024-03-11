@@ -33,14 +33,16 @@ from sugar3.activity.widgets import StopButton, ActivityToolbarButton
 import sugargame.canvas
 import main
 
-DESCRIPTION = """\
+from gettext import gettext as _
+
+DESCRIPTION = _("""\
 There are 3 houses in a town and 3 utilities - water, gas and electricity \
 for which you have to lay down supply lines for. The supply lines must not \
 intersect with each other.
 Click on any of the utilities to start laying down the pipelines and click \
 on a house to terminate the pipeline. Find a solution such that all houses \
 are connected with all 3 utilities.
-"""
+""")
 
 
 class ThreeUtilitiesActivity(Activity):

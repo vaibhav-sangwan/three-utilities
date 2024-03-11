@@ -34,10 +34,12 @@ from pygame import mixer
 from home import Home
 from utility import Utility
 
+from gettext import gettext as _
+
 pygame.init()
 INS_FONT = pygame.font.SysFont("ubuntumono", 18, bold=True)
 ERROR_FONT = pygame.font.SysFont("ubuntumono", 24, bold=True)
-INSTRUCTIONS = ["R - Restart", "S - Stop line", "M - Toggle Mute"]
+INSTRUCTIONS = [_("R - Restart"), _("S - Stop line"), _("M - Toggle Mute")]
 ACHIEVEMENT_SOUND = mixer.Sound("assets/sounds/bonus.mp3")
 WIN_SOUND = mixer.Sound("assets/sounds/win.mp3")
 UTILITIES = [("water", "blue"), ("electricity", "red"), ("gas", "green")]
@@ -46,7 +48,7 @@ UTILITIES = [("water", "blue"), ("electricity", "red"), ("gas", "green")]
 class ThreeUtilities:
     def __init__(self):
         pygame.display.init()
-        pygame.display.set_caption("Three Utilities")
+        pygame.display.set_caption(_("Three Utilities"))
         self.clock = pygame.time.Clock()
         self.mute = False
         self.sound_channel = mixer.find_channel(True)
@@ -156,7 +158,7 @@ class ThreeUtilities:
         if self.level[0] == 1:
             disp_level -= 1
         if self.state == "running":
-            level_msg = ERROR_FONT.render("LEVEL " + str(disp_level),
+            level_msg = ERROR_FONT.render(_("LEVEL ") + str(disp_level),
                                           False,
                                           "black",)
             level_msg_rect = level_msg.get_rect(
@@ -213,12 +215,12 @@ class ThreeUtilities:
         intersect_point = self.segment_intersect((ts, te), (os, oe))
         # when the line is connecting a supply to already connected house
         if (terminating and terminating.connected[self.originate]):
-            self.err_message = "Already Connected"
+            self.err_message = _("Already Connected")
             self.collision_point = terminating.rect.center
             return True
         # when the lines are coincident
         if (ts, te) == (os, oe) or (ts, te) == (oe, os):
-            self.err_message = "Collision"
+            self.err_message = _("Collision")
             self.collision_point = te
             return True
         if not intersect_point:
@@ -229,7 +231,7 @@ class ThreeUtilities:
             return False
 
         self.collision_point = intersect_point
-        self.err_message = "Collision"
+        self.err_message = _("Collision")
         return True
 
     def check_collision(self, start, end, startNode, endNode):
