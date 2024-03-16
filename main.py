@@ -466,28 +466,28 @@ class ThreeUtilities:
                         (event.size[0], event.size[1]), pygame.RESIZABLE
                     )
                     self.load_level(self.level)
-                elif event.type == pygame.MOUSEBUTTONDOWN \
-                        and self.state == "running":
+                elif event.type == pygame.MOUSEBUTTONDOWN:
                     mouse_pos = pygame.mouse.get_pos()
-                    self.draw_lines(pygame.mouse.get_pos())
-                    self.total_connects += self.new_connects
-                    if self.total_connects >= self.level[0] * self.level[1]:
-                        self.sound_channel.play(WIN_SOUND)
-                        if self.level[0] == 3:
-                            self.homes = []
-                            self.utilities = []
-                            self.lines = []
-                            self.state = "win"
-                            self.show_solution = False
-                            self.show_hint = False
-                        else:
-                            self.level[1] += 1
-                            if self.level[1] > 3:
-                                self.level[0] += 1
-                                self.level[1] = self.level[0]
-                            self.load_level(self.level)
-                    elif self.new_connects > 0:
-                        self.sound_channel.play(ACHIEVEMENT_SOUND)
+                    if self.state == "running":
+                        self.draw_lines(pygame.mouse.get_pos())
+                        self.total_connects += self.new_connects
+                        if self.total_connects >= self.level[0] * self.level[1]:
+                            self.sound_channel.play(WIN_SOUND)
+                            if self.level[0] == 3:
+                                self.homes = []
+                                self.utilities = []
+                                self.lines = []
+                                self.state = "win"
+                                self.show_solution = False
+                                self.show_hint = False
+                            else:
+                                self.level[1] += 1
+                                if self.level[1] > 3:
+                                    self.level[0] += 1
+                                    self.level[1] = self.level[0]
+                                self.load_level(self.level)
+                        elif self.new_connects > 0:
+                            self.sound_channel.play(ACHIEVEMENT_SOUND)
 
                     if self.res_button.clicked(mouse_pos):
                         if self.state == "win":
