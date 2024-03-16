@@ -23,7 +23,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-03-11 21:55+0530\n"
+"POT-Creation-Date: 2024-03-16 18:47+0530\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -32,7 +32,7 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: activity/activity.info:2 main.py:51
+#: activity/activity.info:2 main.py:65
 msgid "Three Utilities"
 msgstr ""
 
@@ -46,26 +46,70 @@ msgid ""
 "are connected with all 3 utilities.\n"
 msgstr ""
 
-#: main.py:42
-msgid "R - Restart"
+#: main.py:50
+msgid "Uh-oh, the household needs some water."
 msgstr ""
 
-#: main.py:42
-msgid "S - Stop line"
+#: main.py:51
+msgid "The plumber has been called for laying water pipelines for two houses."
 msgstr ""
 
-#: main.py:42
-msgid "M - Toggle Mute"
+#: main.py:53
+msgid ""
+"You've become the water supply engineer of your town, make sure that all the "
+"houses are connected."
 msgstr ""
 
-#: main.py:161
+#: main.py:55
+msgid "Here comes a zap! You might need to bend some wires."
+msgstr ""
+
+#: main.py:56
+msgid "Water flows underground and Electricity is supplied through roofs."
+msgstr ""
+
+#: main.py:57
+msgid ""
+"Did you know that you can connect more than 1 household with a single supply "
+"line?"
+msgstr ""
+
+#: main.py:70
+msgid "Restart"
+msgstr ""
+
+#: main.py:74
+msgid "Mute"
+msgstr ""
+
+#: main.py:74
+msgid "Unmute"
+msgstr ""
+
+#: main.py:79
+msgid "Show Hint"
+msgstr ""
+
+#: main.py:79
+msgid "Hide Hint"
+msgstr ""
+
+#: main.py:85
+msgid "Show Solution"
+msgstr ""
+
+#: main.py:85
+msgid "Hide Solution"
+msgstr ""
+
+#: main.py:290
 msgid "LEVEL "
 msgstr ""
 
-#: main.py:218
+#: main.py:348
 msgid "Already Connected"
 msgstr ""
 
-#: main.py:223 main.py:234
+#: main.py:353 main.py:364
 msgid "Collision"
 msgstr ""

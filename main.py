@@ -47,14 +47,15 @@ ACHIEVEMENT_SOUND = mixer.Sound("assets/sounds/bonus.mp3")
 WIN_SOUND = mixer.Sound("assets/sounds/win.mp3")
 UTILITIES = [("water", "blue"), ("electricity", "red"), ("gas", "green")]
 HINTS = [
-    "Uh-oh, the household needs some water.",
-    "The plumber has been called for laying water pipelines for two houses.",
-    "You've become the water supply engineer of your town, \
-    make sure that all the houses are connected.",
-    "Here comes a zap! You might need to bend some wires.",
-    "Water flows underground and Electricity is supplied through roofs.",
-    "Did you know that you can connect more than 1 household \
-    with a single supply line?",
+    _("Uh-oh, the household needs some water."),
+    _("The plumber has been called for laying water pipelines for two \
+houses."),
+    _("You've become the water supply engineer of your town, \
+make sure that all the houses are connected."),
+    _("Here comes a zap! You might need to bend some wires."),
+    _("Water flows underground and Electricity is supplied through roofs."),
+    _("Did you know that you can connect more than 1 household \
+with a single supply line?"),
 ]
 
 
@@ -66,22 +67,22 @@ class ThreeUtilities:
         self.mute = False
         self.sound_channel = mixer.find_channel(True)
         self.level = [1, 1]
-        self.res_button = Button(195, 30, ["restart"], ["Restart"])
+        self.res_button = Button(195, 30, ["restart"], [_("Restart")])
         self.mute_button = Button(150,
                                   30,
                                   ["unmute", "mute"],
-                                  ["Mute", "Unmute"])
+                                  [_("Mute"), _("Unmute")])
         self.hint_button = Button(
             110,
             30,
             ["show-hint", "hide-hint"],
-            ["Show Hint", "Hide Hint"]
+            [_("Show Hint"), _("Hide Hint")]
         )
         self.sol_button = Button(
             70,
             30,
             ["show-sol", "hide-sol"],
-            ["Show Solution", "Hide Solution"]
+            [_("Show Solution"), _("Hide Solution")]
         )
         self.buttons = [
             self.res_button,
