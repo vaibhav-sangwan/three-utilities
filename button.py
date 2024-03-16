@@ -26,16 +26,18 @@ import pygame
 class Button(pygame.sprite.Sprite):
     def __init__(self, offcx, offcy, states, prompts):
         super().__init__()
-        
+
         self.states = states
         self.prompts = prompts
         self.curr_state = 0
         self.active = False
         self.offcx = offcx
         self.offcy = offcy
-        self.image = pygame.image.load('./assets/' + self.states[self.curr_state] + '.png')
+        self.image = pygame.image.load(
+            "./assets/" + self.states[self.curr_state] + ".png"
+        )
         self.rect = self.image.get_rect(center=(0, 0))
-    
+
     def reset_state(self):
         self.active = False
         self.curr_state = 0
@@ -47,20 +49,19 @@ class Button(pygame.sprite.Sprite):
                     self.active = True
                 else:
                     self.active = False
-        
-        image_dir = './assets/' + self.states[self.curr_state]
+
+        image_dir = "./assets/" + self.states[self.curr_state]
         if self.active:
-            image_dir += '-active'
-        image_dir += '.png'
+            image_dir += "-active"
+        image_dir += ".png"
         self.image = pygame.image.load(image_dir)
-    
+
     def toggle_state(self):
         self.curr_state += 1
         self.curr_state %= len(self.states)
-    
+
     def clicked(self, mouse_pos):
         return self.rect.collidepoint(mouse_pos)
-    
+
     def screen_resize(self, screen):
         self.rect.centery = screen.get_height() - 30
-                    

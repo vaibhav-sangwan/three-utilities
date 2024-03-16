@@ -49,10 +49,12 @@ UTILITIES = [("water", "blue"), ("electricity", "red"), ("gas", "green")]
 HINTS = [
     "Uh-oh, the household needs some water.",
     "The plumber has been called for laying water pipelines for two houses.",
-    "You've become the water supply engineer of your town, make sure that all the houses are connected.",
+    "You've become the water supply engineer of your town, \
+    make sure that all the houses are connected.",
     "Here comes a zap! You might need to bend some wires.",
     "Water flows underground and Electricity is supplied through roofs.",
-    "Did you know that you can connect more than 1 household with a single supply line?"
+    "Did you know that you can connect more than 1 household \
+    with a single supply line?",
 ]
 
 
@@ -65,19 +67,42 @@ class ThreeUtilities:
         self.sound_channel = mixer.find_channel(True)
         self.level = [1, 1]
         self.res_button = Button(195, 30, ["restart"], ["Restart"])
-        self.mute_button = Button(150, 30, ["unmute", "mute"], ["Mute", "Unmute"])
-        self.hint_button = Button(110, 30, ["show-hint", "hide-hint"], ["Show Hint", "Hide Hint"])
-        self.sol_button = Button(70, 30, ["show-sol", "hide-sol"], ["Show Solution", "Hide Solution"])
-        self.buttons = [self.res_button, self.mute_button, self.hint_button, self.sol_button]
+        self.mute_button = Button(150,
+                                  30,
+                                  ["unmute", "mute"],
+                                  ["Mute", "Unmute"])
+        self.hint_button = Button(
+            110,
+            30,
+            ["show-hint", "hide-hint"],
+            ["Show Hint", "Hide Hint"]
+        )
+        self.sol_button = Button(
+            70,
+            30,
+            ["show-sol", "hide-sol"],
+            ["Show Solution", "Hide Solution"]
+        )
+        self.buttons = [
+            self.res_button,
+            self.mute_button,
+            self.hint_button,
+            self.sol_button,
+        ]
         self.load_level(self.level)
-    
+
     def save_data(self, file):
         info = []
         print(self.lines)
         for line in self.lines:
             curr_info = [line[0].color]
             for j in range(1, len(line)):
-                curr_info.append((line[j][0] - self.screen.get_width()/2, line[j][1] - self.screen.get_height()/2))
+                curr_info.append(
+                    (
+                        line[j][0] - self.screen.get_width() / 2,
+                        line[j][1] - self.screen.get_height() / 2,
+                    )
+                )
             info.append(curr_info)
         with open(file, "wb") as fp:
             pickle.dump(info, fp)
@@ -114,8 +139,7 @@ class ThreeUtilities:
         for i in range(1, houses + 1):
             self.homes.append(
                 Home(house_start + ((i - 1) * dist),
-                     h / 2 + 100,
-                     self.utilities)
+                     h / 2 + 100, self.utilities)
             )
 
         self.originate = None
@@ -131,22 +155,24 @@ class ThreeUtilities:
 
         self.show_solution = False
         self.show_hint = False
-    
+
     def get_curr_level(self):
         res = self.level[0] + self.level[1]
         if self.level[0] == 1:
             res -= 1
         return res
 
-    def draw_dashed_line(self, surf, color, start_pos, end_pos, width=1, dash_length=10):
+    def draw_dashed_line(
+        self, surf, color, start_pos, end_pos, width=1, dash_length=10
+    ):
         x1, y1 = int(start_pos[0]), int(start_pos[1])
         x2, y2 = int(end_pos[0]), int(end_pos[1])
         dl = dash_length
 
-        if (x1 == x2):
+        if x1 == x2:
             ycoords = [y for y in range(y1, y2, dl if y1 < y2 else -dl)]
             xcoords = [x1] * len(ycoords)
-        elif (y1 == y2):
+        elif y1 == y2:
             xcoords = [x for x in range(x1, x2, dl if x1 < x2 else -dl)]
             ycoords = [y1] * len(xcoords)
         else:
@@ -176,9 +202,9 @@ class ThreeUtilities:
         if self.show_solution:
             with open("./solutions/" + str(self.get_curr_level()), "rb") as fp:
                 help_lines = pickle.load(fp)
-            
-            scx = self.screen.get_width()/2
-            scy = self.screen.get_height()/2
+
+            scx = self.screen.get_width() / 2
+            scy = self.screen.get_height() / 2
             for line in help_lines:
                 for j in range(1, len(line) - 1):
                     start = (line[j][0] + scx, line[j][1] + scy)
@@ -194,11 +220,13 @@ class ThreeUtilities:
                                  line[j + 1],
                                  3)
             if (i == len(self.lines) - 1) and self.originate:
-                pygame.draw.line(self.screen,
-                                 line[0].color,
-                                 line[-1],
-                                 pygame.mouse.get_pos(),
-                                 3)
+                pygame.draw.line(
+                    self.screen,
+                    line[0].color,
+                    line[-1],
+                    pygame.mouse.get_pos(),
+                    3
+                )
 
         for home in self.homes:
             home.update(self.py_events)
@@ -226,29 +254,42 @@ class ThreeUtilities:
         if self.collision_point:
             pygame.draw.circle(self.screen, "red", self.collision_point, 5)
             error = ERROR_FONT.render(self.err_message, False, "red")
-            error_rect = error.get_rect(center=(self.screen.get_width() / 2,
-                                                self.screen.get_height() - 30))
+            error_rect = error.get_rect(
+                center=(self.screen.get_width() / 2,
+                        self.screen.get_height() - 30)
+            )
             self.screen.blit(error, error_rect)
-        
+
         for button in self.buttons:
             button.update(self.py_events)
-            button.rect.center = (self.screen.get_width() - button.offcx, self.screen.get_height() - button.offcy)
+            button.rect.center = (
+                self.screen.get_width() - button.offcx,
+                self.screen.get_height() - button.offcy,
+            )
             self.screen.blit(button.image, button.rect)
             if button.active:
-                prompt_text = PROMPT_FONT.render(button.prompts[button.curr_state], False, "black")
-                prompt_rect = prompt_text.get_rect(center = (button.rect.centerx, button.rect.top - 10))
+                prompt_text = PROMPT_FONT.render(
+                    button.prompts[button.curr_state], False, "black"
+                )
+                prompt_rect = prompt_text.get_rect(
+                    center=(button.rect.centerx, button.rect.top - 10)
+                )
                 self.screen.blit(prompt_text, prompt_rect)
-                      
+
         if self.show_hint:
-            hint_msg = PROMPT_FONT.render(HINTS[self.get_curr_level() - 1], False, "black")
-            hint_rect = hint_msg.get_rect(topleft = (10, 40))
+            hint_msg = PROMPT_FONT.render(
+                HINTS[self.get_curr_level() - 1], False, "black"
+            )
+            hint_rect = hint_msg.get_rect(topleft=(10, 40))
             self.screen.blit(hint_msg, hint_rect)
 
         disp_level = self.get_curr_level()
         if self.state == "running":
-            level_msg = ERROR_FONT.render(_("LEVEL ") + str(disp_level),
-                                          False,
-                                          "black",)
+            level_msg = ERROR_FONT.render(
+                _("LEVEL ") + str(disp_level),
+                False,
+                "black",
+            )
             level_msg_rect = level_msg.get_rect(
                 center=(self.screen.get_width() / 2, 20)
             )
@@ -302,7 +343,7 @@ class ThreeUtilities:
     def lines_collide(self, ts, te, os, oe, originating, terminating):
         intersect_point = self.segment_intersect((ts, te), (os, oe))
         # when the line is connecting a supply to already connected house
-        if (terminating and terminating.connected[self.originate]):
+        if terminating and terminating.connected[self.originate]:
             self.err_message = _("Already Connected")
             self.collision_point = terminating.rect.center
             return True
@@ -379,7 +420,7 @@ class ThreeUtilities:
                                              start[1],
                                              pos[0],
                                              pos[1])
-                if (passing and home.rect.center != start):
+                if passing and home.rect.center != start:
                     nodes.append(home.rect.center)
                 if home.rect.collidepoint(pos):
                     terminates = True
@@ -405,7 +446,7 @@ class ThreeUtilities:
             # if the supply line is terminating but
             # already collided, then originate should remain
             # active instead of getting set to None
-            if (terminates and not collided):
+            if terminates and not collided:
                 self.originate = None
 
     def run(self):
@@ -424,8 +465,8 @@ class ThreeUtilities:
                         (event.size[0], event.size[1]), pygame.RESIZABLE
                     )
                     self.load_level(self.level)
-                elif event.type == pygame.MOUSEBUTTONDOWN and \
-                        self.state == "running":
+                elif event.type == pygame.MOUSEBUTTONDOWN \
+                        and self.state == "running":
                     mouse_pos = pygame.mouse.get_pos()
                     self.draw_lines(pygame.mouse.get_pos())
                     self.total_connects += self.new_connects
@@ -446,7 +487,7 @@ class ThreeUtilities:
                             self.load_level(self.level)
                     elif self.new_connects > 0:
                         self.sound_channel.play(ACHIEVEMENT_SOUND)
-    
+
                     if self.res_button.clicked(mouse_pos):
                         if self.state == "win":
                             self.level = [1, 1]
@@ -454,13 +495,15 @@ class ThreeUtilities:
                     elif self.mute_button.clicked(mouse_pos):
                         self.toggle_mute()
                         self.mute_button.toggle_state()
-                    elif self.sol_button.clicked(mouse_pos) and self.state == "running":
+                    elif self.sol_button.clicked(mouse_pos) \
+                            and self.state == "running":
                         self.show_solution = not self.show_solution
                         self.sol_button.toggle_state()
-                    elif self.hint_button.clicked(mouse_pos) and self.state == "running":
+                    elif self.hint_button.clicked(mouse_pos) and \
+                            self.state == "running":
                         self.show_hint = not self.show_hint
                         self.hint_button.toggle_state()
-                
+
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_s:
                         self.originate = None
