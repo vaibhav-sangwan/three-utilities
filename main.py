@@ -33,6 +33,7 @@ from pygame import mixer
 
 from home import Home
 from utility import Utility
+from button import Button
 
 from gettext import gettext as _
 
@@ -40,12 +41,19 @@ import pickle
 import numpy
 
 pygame.init()
-INS_FONT = pygame.font.SysFont("ubuntumono", 18, bold=True)
+PROMPT_FONT = pygame.font.SysFont("ubuntumono", 18, bold=True)
 ERROR_FONT = pygame.font.SysFont("ubuntumono", 24, bold=True)
-INSTRUCTIONS = [_("R - Restart"), _("D - Stop line"), _("M - Toggle Mute"), _("H - Toggle Show Solution")]
 ACHIEVEMENT_SOUND = mixer.Sound("assets/sounds/bonus.mp3")
 WIN_SOUND = mixer.Sound("assets/sounds/win.mp3")
 UTILITIES = [("water", "blue"), ("electricity", "red"), ("gas", "green")]
+HINTS = [
+    "Uh-oh, the household needs some water.",
+    "The plumber has been called for laying water pipelines for two houses.",
+    "You've become the water supply engineer of your town, make sure that all the houses are connected.",
+    "Here comes a zap! You might need to bend some wires.",
+    "Water flows underground and Electricity is supplied through roofs.",
+    "Did you know that you can connect more than 1 household with a single supply line?"
+]
 
 
 class ThreeUtilities:
@@ -56,6 +64,11 @@ class ThreeUtilities:
         self.mute = False
         self.sound_channel = mixer.find_channel(True)
         self.level = [1, 1]
+        self.res_button = Button(195, 30, ["restart"], ["Restart"])
+        self.mute_button = Button(150, 30, ["unmute", "mute"], ["Mute", "Unmute"])
+        self.hint_button = Button(110, 30, ["show-hint", "hide-hint"], ["Show Hint", "Hide Hint"])
+        self.sol_button = Button(70, 30, ["show-sol", "hide-sol"], ["Show Solution", "Hide Solution"])
+        self.buttons = [self.res_button, self.mute_button, self.hint_button, self.sol_button]
         self.load_level(self.level)
     
     def save_data(self, file):
@@ -79,6 +92,9 @@ class ThreeUtilities:
         utils, houses = level
         mid = w / 2
         dist = 200
+
+        self.sol_button.reset_state()
+        self.hint_button.reset_state()
 
         util_wid = (utils - 1) * dist
         util_start = mid - (util_wid / 2)
@@ -114,6 +130,7 @@ class ThreeUtilities:
         self.state = "running"
 
         self.show_solution = False
+        self.show_hint = False
     
     def get_curr_level(self):
         res = self.level[0] + self.level[1]
@@ -148,6 +165,10 @@ class ThreeUtilities:
             start = (round(x1), round(y1))
             end = (round(x2), round(y2))
             pygame.draw.line(surf, color, start, end, width)
+
+    def toggle_mute(self):
+        self.mute = not self.mute
+        self.sound_channel.set_volume(0 if self.mute else 1)
 
     def draw(self):
         self.screen.fill("white")
@@ -208,13 +229,20 @@ class ThreeUtilities:
             error_rect = error.get_rect(center=(self.screen.get_width() / 2,
                                                 self.screen.get_height() - 30))
             self.screen.blit(error, error_rect)
-
-        top = 10
-        for instruction in INSTRUCTIONS:
-            inst = INS_FONT.render(instruction, False, "black")
-            inst_rect = inst.get_rect(topleft=(10, top))
-            top += 20
-            self.screen.blit(inst, inst_rect)
+        
+        for button in self.buttons:
+            button.update(self.py_events)
+            button.rect.center = (self.screen.get_width() - button.offcx, self.screen.get_height() - button.offcy)
+            self.screen.blit(button.image, button.rect)
+            if button.active:
+                prompt_text = PROMPT_FONT.render(button.prompts[button.curr_state], False, "black")
+                prompt_rect = prompt_text.get_rect(center = (button.rect.centerx, button.rect.top - 10))
+                self.screen.blit(prompt_text, prompt_rect)
+                      
+        if self.show_hint:
+            hint_msg = PROMPT_FONT.render(HINTS[self.get_curr_level() - 1], False, "black")
+            hint_rect = hint_msg.get_rect(topleft = (10, 40))
+            self.screen.blit(hint_msg, hint_rect)
 
         disp_level = self.get_curr_level()
         if self.state == "running":
@@ -398,6 +426,7 @@ class ThreeUtilities:
                     self.load_level(self.level)
                 elif event.type == pygame.MOUSEBUTTONDOWN and \
                         self.state == "running":
+                    mouse_pos = pygame.mouse.get_pos()
                     self.draw_lines(pygame.mouse.get_pos())
                     self.total_connects += self.new_connects
                     if self.total_connects >= self.level[0] * self.level[1]:
@@ -408,6 +437,7 @@ class ThreeUtilities:
                             self.lines = []
                             self.state = "win"
                             self.show_solution = False
+                            self.show_hint = False
                         else:
                             self.level[1] += 1
                             if self.level[1] > 3:
@@ -416,18 +446,24 @@ class ThreeUtilities:
                             self.load_level(self.level)
                     elif self.new_connects > 0:
                         self.sound_channel.play(ACHIEVEMENT_SOUND)
-                elif event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_r:
+    
+                    if self.res_button.clicked(mouse_pos):
                         if self.state == "win":
                             self.level = [1, 1]
                         self.load_level(self.level)
-                    elif event.key == pygame.K_s:
-                        self.originate = None
-                    elif event.key == pygame.K_m:
-                        self.mute = not self.mute
-                        self.sound_channel.set_volume(0 if self.mute else 1)
-                    elif event.key == pygame.K_h and self.state == "running":
+                    elif self.mute_button.clicked(mouse_pos):
+                        self.toggle_mute()
+                        self.mute_button.toggle_state()
+                    elif self.sol_button.clicked(mouse_pos) and self.state == "running":
                         self.show_solution = not self.show_solution
+                        self.sol_button.toggle_state()
+                    elif self.hint_button.clicked(mouse_pos) and self.state == "running":
+                        self.show_hint = not self.show_hint
+                        self.hint_button.toggle_state()
+                
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_s:
+                        self.originate = None
 
             self.draw()
 
