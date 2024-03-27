@@ -27,6 +27,7 @@ from gi.repository import Gtk
 
 import math
 from functools import cmp_to_key
+from utils import dist, segment_intersect
 
 import pygame
 from pygame import mixer
@@ -68,10 +69,12 @@ class ThreeUtilities:
         self.sound_channel = mixer.find_channel(True)
         self.level = [1, 1]
         self.res_button = Button(195, 30, ["restart"], [_("Restart")])
-        self.mute_button = Button(150,
-                                  30,
-                                  ["unmute", "mute"],
-                                  [_("Mute"), _("Unmute")])
+        self.mute_button = Button(
+            150,
+            30,
+            ["unmute", "mute"],
+            [_("Mute"), _("Unmute")]
+        )
         self.hint_button = Button(
             110,
             30,
@@ -297,52 +300,15 @@ class ThreeUtilities:
             self.screen.blit(level_msg, level_msg_rect)
 
         if self.state == "win":
-            win_msg = pygame.image.load("./assets/util-win.png")
+            win_msg = pygame.image.load("./assets/images/util-win.png")
             win_msg_rect = win_msg.get_rect(
                 center=(self.screen.get_width() / 2,
                         self.screen.get_height() / 2)
             )
             self.screen.blit(win_msg, win_msg_rect)
 
-    def lineLineIntersect(self, P0, P1, Q0, Q1):
-        dx = (P1[0] - P0[0]) * (Q1[1] - Q0[1])
-        dy = (P1[1] - P0[1]) * (Q0[0] - Q1[0])
-        d = dx + dy
-        if d == 0:
-            return None
-
-        tx = (Q0[0] - P0[0]) * (Q1[1] - Q0[1])
-        ty = (Q0[1] - P0[1]) * (Q0[0] - Q1[0])
-        t = (tx + ty) / d
-        ux = (Q0[0] - P0[0]) * (P1[1] - P0[1])
-        uy = (Q0[1] - P0[1]) * (P0[0] - P1[0])
-        u = (ux + uy) / d
-        if 0 <= t <= 1 and 0 <= u <= 1:
-            return round(P1[0] * t + P0[0] * (1 - t)), round(
-                P1[1] * t + P0[1] * (1 - t)
-            )
-        return None
-
-    def segment_intersect(self, line1, line2):
-        intersection_pt = self.lineLineIntersect(line1[0],
-                                                 line1[1],
-                                                 line2[0],
-                                                 line2[1])
-
-        if not intersection_pt:
-            return None
-
-        minm = min(line1[0][0], line1[1][0])
-        maxm = max(line1[0][0], line1[1][0])
-        if intersection_pt[0] < minm or intersection_pt[0] > maxm:
-            return None
-        if intersection_pt[0] < minm or intersection_pt[0] > maxm:
-            return None
-
-        return intersection_pt
-
     def lines_collide(self, ts, te, os, oe, originating, terminating):
-        intersect_point = self.segment_intersect((ts, te), (os, oe))
+        intersect_point = segment_intersect((ts, te), (os, oe))
         # when the line is connecting a supply to already connected house
         if terminating and terminating.connected[self.originate]:
             self.err_message = _("Already Connected")
@@ -359,11 +325,10 @@ class ThreeUtilities:
             return False
         if intersect_point == te and terminating:
             return False
-
         self.collision_point = intersect_point
         self.err_message = _("Collision")
         return True
-
+    
     def check_collision(self, start, end, startNode, endNode):
         for i in range(len(self.lines)):
             line = self.lines[i]
@@ -375,9 +340,6 @@ class ThreeUtilities:
                 ):
                     return True
         return False
-
-    def dist(self, start, end):
-        return math.hypot(start[0] - end[0], start[1] - end[1])
 
     def draw_line(self, start, end):
         startNode = None
@@ -431,7 +393,7 @@ class ThreeUtilities:
             nodes = sorted(
                 nodes,
                 key=cmp_to_key(lambda x, y:
-                               self.dist(x, start) - self.dist(y, start)),
+                               dist(x, start) - dist(y, start)),
             )
 
             prevNode = start

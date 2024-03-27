@@ -28,7 +28,7 @@ class Utility(pygame.sprite.Sprite):
         super().__init__()
         self.type = type
         self.color = color
-        self.image = pygame.image.load('./assets/' + self.type + '.png')
+        self.image = pygame.image.load('./assets/images/' + self.type + '.png')
         self.rect = self.image.get_rect(center=(x, y))
         self.active = False
 
@@ -38,10 +38,10 @@ class Utility(pygame.sprite.Sprite):
                 if self.rect.collidepoint(pygame.mouse.get_pos()):
                     self.active = True
                     self.image = pygame.image.load(
-                        './assets/' + self.type + '-active.png'
+                        './assets/images/' + self.type + '-active.png'
                     )
                 else:
                     self.active = False
                     self.image = pygame.image.load(
-                        './assets/' + self.type + '.png'
+                        './assets/images/' + self.type + '.png'
                     )

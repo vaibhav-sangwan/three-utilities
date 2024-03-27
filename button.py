@@ -34,7 +34,7 @@ class Button(pygame.sprite.Sprite):
         self.offcx = offcx
         self.offcy = offcy
         self.image = pygame.image.load(
-            "./assets/" + self.states[self.curr_state] + ".png"
+            "./assets/images/" + self.states[self.curr_state] + ".png"
         )
         self.rect = self.image.get_rect(center=(0, 0))
 
@@ -50,7 +50,7 @@ class Button(pygame.sprite.Sprite):
                 else:
                     self.active = False
 
-        image_dir = "./assets/" + self.states[self.curr_state]
+        image_dir = "./assets/images/" + self.states[self.curr_state]
         if self.active:
             image_dir += "-active"
         image_dir += ".png"

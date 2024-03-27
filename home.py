@@ -26,7 +26,7 @@ import pygame
 class Home(pygame.sprite.Sprite):
     def __init__(self, x, y, utils):
         super().__init__()
-        self.image = pygame.image.load('./assets/home.png')
+        self.image = pygame.image.load('./assets/images/home.png')
         self.connected = {util: False for util in utils}
 
         self.rect = self.image.get_rect(center=(x, y))
@@ -41,7 +41,7 @@ class Home(pygame.sprite.Sprite):
             if event.type == pygame.MOUSEMOTION:
                 if self.rect.collidepoint(pygame.mouse.get_pos()):
                     self.active = True
-                    self.image = pygame.image.load('./assets/home-active.png')
+                    self.image = pygame.image.load('./assets/images/home-active.png')
                 else:
                     self.active = False
-                    self.image = pygame.image.load('./assets/home.png')
+                    self.image = pygame.image.load('./assets/images/home.png')
