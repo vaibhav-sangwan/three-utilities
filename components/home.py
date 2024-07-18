@@ -22,11 +22,15 @@
 
 import pygame
 
+from utils import Utils
+
 
 class Home(pygame.sprite.Sprite):
     def __init__(self, x, y, utils):
         super().__init__()
-        self.image = pygame.image.load('./assets/images/home.png')
+        self.inactive_img = pygame.image.load('./assets/images/home.png')
+        self.active_img = pygame.image.load('./assets/images/home-active.png')
+        self.image = self.inactive_img
         self.connected = {util: False for util in utils}
 
         self.rect = self.image.get_rect(center=(x, y))
@@ -36,12 +40,10 @@ class Home(pygame.sprite.Sprite):
         self.rect.top += 16
         self.active = False
 
-    def update(self, py_events):
-        for event in py_events:
-            if event.type == pygame.MOUSEMOTION:
-                if self.rect.collidepoint(pygame.mouse.get_pos()):
-                    self.active = True
-                    self.image = pygame.image.load('./assets/images/home-active.png')
-                else:
-                    self.active = False
-                    self.image = pygame.image.load('./assets/images/home.png')
+    def update(self):
+        if self.rect.collidepoint(Utils.norm_cursor_pos()):
+            self.image = self.active_img
+            self.active = True
+        else:
+            self.image = self.inactive_img
+            self.active = False

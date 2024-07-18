@@ -22,26 +22,24 @@
 
 import pygame
 
+from utils import Utils
+
 
 class Utility(pygame.sprite.Sprite):
     def __init__(self, x, y, type, color):
         super().__init__()
         self.type = type
         self.color = color
-        self.image = pygame.image.load('./assets/images/' + self.type + '.png')
+        self.inactive_img = pygame.image.load('./assets/images/' + self.type + '.png')
+        self.active_img = pygame.image.load('./assets/images/' + self.type + '-active.png')
+        self.image = self.inactive_img
         self.rect = self.image.get_rect(center=(x, y))
         self.active = False
 
-    def update(self, py_events):
-        for event in py_events:
-            if event.type == pygame.MOUSEMOTION:
-                if self.rect.collidepoint(pygame.mouse.get_pos()):
-                    self.active = True
-                    self.image = pygame.image.load(
-                        './assets/images/' + self.type + '-active.png'
-                    )
-                else:
-                    self.active = False
-                    self.image = pygame.image.load(
-                        './assets/images/' + self.type + '.png'
-                    )
+    def update(self):
+        if self.rect.collidepoint(Utils.norm_cursor_pos()):
+            self.image = self.active_img
+            self.active = True
+        else:
+            self.image = self.inactive_img
+            self.active = False
