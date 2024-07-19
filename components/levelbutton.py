@@ -23,7 +23,7 @@
 import pygame
 
 from utils import Utils
-PROMPT_FONT = pygame.font.SysFont("ubuntumono", 18, bold=True)
+font_s = pygame.font.Font("./fonts/m04b.ttf", 8)
 
 
 class LevelButton(pygame.sprite.Sprite):
@@ -67,7 +67,7 @@ class LevelButton(pygame.sprite.Sprite):
     def draw(self, screen):
         screen.blit(self.image, self.rect)
         if self.state[1] == 1:
-            prompt_text = PROMPT_FONT.render(
+            prompt_text = font_s.render(
                 self.prompts[self.state[0]], False, "black"
             )
             prompt_rect = prompt_text.get_rect(

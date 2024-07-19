@@ -37,8 +37,9 @@ import pickle
 import numpy
 
 pygame.init()
-PROMPT_FONT = pygame.font.SysFont("ubuntumono", 18, bold=True)
-ERROR_FONT = pygame.font.SysFont("ubuntumono", 24, bold=True)
+font_s = pygame.font.Font("./fonts/m04b.ttf", 8)
+font_m = pygame.font.Font("./fonts/m04b.ttf", 12)
+font_l = pygame.font.Font("./fonts/3Dventure.ttf", 32)
 ACHIEVEMENT_SOUND = mixer.Sound("assets/sounds/bonus.mp3")
 WIN_SOUND = mixer.Sound("assets/sounds/win.mp3")
 UTILITIES = [("water", "blue"), ("electricity", "red"), ("gas", "green")]
@@ -235,8 +236,8 @@ class Level:
             scy = self.screen.get_height() / 2
             for line in help_lines:
                 for j in range(1, len(line) - 1):
-                    start = (line[j][0] + scx, line[j][1] + scy)
-                    end = (line[j + 1][0] + scx, line[j + 1][1] + scy)
+                    start = (line[j][0] + scx, line[j][1] + scy - 40)
+                    end = (line[j + 1][0] + scx, line[j + 1][1] + scy - 40)
                     self.draw_dashed_line(self.screen, line[0], start, end, 1)
 
         for i in range(len(self.lines)):
@@ -281,7 +282,7 @@ class Level:
 
         if self.collision_point:
             pygame.draw.circle(self.screen, "red", self.collision_point, 5)
-            error = ERROR_FONT.render(self.err_message, False, "red")
+            error = font_m.render(self.err_message, False, "red")
             error_rect = error.get_rect(
                 center=(self.screen.get_width() / 2,
                         self.screen.get_height() - 30)
@@ -289,14 +290,17 @@ class Level:
             self.screen.blit(error, error_rect)
 
         if self.show_hint:
-            hint_msg = PROMPT_FONT.render(
-                HINTS[self.get_curr_level() - 1], False, "black"
+            Utils.render_multiple_lines(
+                HINTS[self.get_curr_level() - 1],
+                self.screen,
+                10,
+                (10, 50),
+                "black",
+                font_s
             )
-            hint_rect = hint_msg.get_rect(topleft=(10, 40))
-            self.screen.blit(hint_msg, hint_rect)
 
         disp_level = self.get_curr_level()
-        level_msg = ERROR_FONT.render(
+        level_msg = font_l.render(
             _("LEVEL ") + str(disp_level),
             False,
             "black",
