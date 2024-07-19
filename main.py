@@ -34,6 +34,7 @@ from pygame import mixer
 from utils import Utils
 from gamestatemanager import GameStateManager
 from states.level import Level
+from states.mainmenu import MainMenu
 
 BASE_RES = (800, 600)
 FPS = 30
@@ -47,14 +48,14 @@ class ThreeUtilities:
         self.sound_channel = mixer.find_channel(True)
 
     def fill_bg(self):
-        self.render_screen.fill("black")
+        self.render_screen.fill("white")
     
     def toggle_mute(self):
         self.mute = not self.mute
         self.sound_channel.set_volume(0 if self.mute else 1)
 
     def run(self):
-        self.screen = pygame.Surface(BASE_RES)
+        self.screen = pygame.Surface(BASE_RES, pygame.SRCALPHA)
         self.render_screen = pygame.display.set_mode((0, 0))
         screen_width = self.render_screen.get_width()
         screen_height = self.render_screen.get_height()
@@ -67,8 +68,9 @@ class ThreeUtilities:
         self.scaled_screen_rect.center = (screen_width / 2, screen_height / 2)
         Utils.scaled_screen_rect = self.scaled_screen_rect
 
-        self.gameStateManager = GameStateManager("level-1-1")
+        self.gameStateManager = GameStateManager("main-menu")
         self.states = {}
+        self.states["main-menu"] = MainMenu(self)
         for i in range(1, 4):
             for j in range(i, 4):
                 self.states["level-" + str(i) + "-" + str(j)] = Level(self, i, j)
