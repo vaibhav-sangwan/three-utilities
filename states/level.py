@@ -62,27 +62,40 @@ class Level:
         self.gameStateManager = game.gameStateManager
         self.game = game
 
+        self.bg = pygame.image.load("./assets/images/bound.png")
+        self.bg_rect = self.bg.get_rect(center=(
+            self.screen.get_width()/2,
+            self.screen.get_height()/2
+        ))
+
         self.level = [num_utils, num_houses]
-        self.res_button = LevelButton(605, 570, ["restart"], [_("Restart")])
+        self.res_button = LevelButton(560, 570, ["restart"], [_("Restart")])
         self.mute_button = LevelButton(
-            650,
+            605,
             570,
             ["unmute", "mute"],
             [_("Mute"), _("Unmute")]
         )
         self.hint_button = LevelButton(
-            690,
+            645,
             570,
             ["show-hint", "hide-hint"],
             [_("Show Hint"), _("Hide Hint")]
         )
         self.sol_button = LevelButton(
-            730,
+            685,
             570,
             ["show-sol", "hide-sol"],
             [_("Show Solution"), _("Hide Solution")]
         )
+        self.home_button = LevelButton(
+            725,
+            569,
+            ['home-button'],
+            [_("Main Menu")]
+        )
         self.buttons = [
+            self.home_button,
             self.res_button,
             self.mute_button,
             self.hint_button,
@@ -201,13 +214,15 @@ class Level:
                 self.show_solution = not self.show_solution
             elif self.hint_button.check_press():
                 self.show_hint = not self.show_hint
+            elif self.home_button.check_press():
+                self.gameStateManager.set_state("main-menu")
             else:
                 self.draw_lines(mouse_pos)
                 self.total_connects += self.new_connects
                 if self.total_connects >= self.level[0] * self.level[1]:
                     self.game.sound_channel.play(WIN_SOUND)
                     if self.level[0] == 3:
-                        self.gameStateManager.set_state(None)
+                        self.gameStateManager.set_state("win-screen")
                     else:
                         houses = self.level[1] + 1
                         utils = self.level[0]
@@ -225,6 +240,7 @@ class Level:
 
     def render(self):
         self.screen.fill("white")
+        self.screen.blit(self.bg, self.bg_rect)
         for button in self.buttons:
             button.draw(self.screen)
 

@@ -74,6 +74,14 @@ class Utils:
         mouse_norm_x = dx * BASE_RES[0] / rect.width
         mouse_norm_y = dy * BASE_RES[1] / rect.height
 
+        if mouse_norm_x < 0:
+            mouse_norm_x = 0
+        if mouse_norm_x >= BASE_RES[0]:
+            mouse_norm_x = BASE_RES[0] - 1
+        if mouse_norm_y < 0:
+            mouse_norm_y = 0
+        if mouse_norm_y >= BASE_RES[1]:
+            mouse_norm_y = BASE_RES[1] - 1
         return mouse_norm_x, mouse_norm_y
 
     @staticmethod

@@ -35,6 +35,8 @@ from utils import Utils
 from gamestatemanager import GameStateManager
 from states.level import Level
 from states.mainmenu import MainMenu
+from states.winscreen import WinScreen
+from states.helpmenu import HelpMenu
 
 BASE_RES = (800, 600)
 FPS = 30
@@ -71,6 +73,8 @@ class ThreeUtilities:
         self.gameStateManager = GameStateManager("main-menu")
         self.states = {}
         self.states["main-menu"] = MainMenu(self)
+        self.states["win-screen"] = WinScreen(self)
+        self.states["help-menu"] = HelpMenu(self)
         for i in range(1, 4):
             for j in range(i, 4):
                 self.states["level-" + str(i) + "-" + str(j)] = Level(self, i, j)

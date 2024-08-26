@@ -124,6 +124,9 @@ class MainMenu:
         if event.type == pygame.MOUSEBUTTONDOWN:
             if self.play_button.check_press():
                 self.gameStateManager.set_level(1, 1)
+                self.game.states[self.gameStateManager.get_state()].reset()
+            if self.help_button.check_press():
+                self.gameStateManager.set_state("help-menu")
 
     def render(self):
         self.screen.fill("white")
