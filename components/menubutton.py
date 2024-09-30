@@ -34,7 +34,7 @@ class MenuButton(pygame.sprite.Sprite):
         self.image = self.inactive_img
 
         self.rect = self.image.get_rect(center=(x, y))
-    
+
     def check_press(self):
         if self.rect.collidepoint(Utils.norm_cursor_pos()):
             return True

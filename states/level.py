@@ -64,8 +64,8 @@ class Level:
 
         self.bg = pygame.image.load("./assets/images/bound.png")
         self.bg_rect = self.bg.get_rect(center=(
-            self.screen.get_width()/2,
-            self.screen.get_height()/2
+            self.screen.get_width() / 2,
+            self.screen.get_height() / 2
         ))
 
         self.level = [num_utils, num_houses]
@@ -103,7 +103,7 @@ class Level:
         ]
 
         self.reset()
-    
+
     def save_data(self, file):
         info = []
         print(self.lines)
@@ -119,7 +119,7 @@ class Level:
             info.append(curr_info)
         with open(file, "wb") as fp:
             pickle.dump(info, fp)
-    
+
     def reset(self):
         self.utilities = []
         utils, houses = self.level
@@ -166,7 +166,7 @@ class Level:
 
         self.show_solution = False
         self.show_hint = False
-    
+
     def get_curr_level(self):
         res = self.level[0] + self.level[1]
         if self.level[0] == 1:
@@ -230,7 +230,8 @@ class Level:
                             utils += 1
                             houses = utils
                         self.gameStateManager.set_level(utils, houses)
-                        self.game.states[self.gameStateManager.get_state()].reset()
+                        curr_state = self.gameStateManager.get_state()
+                        self.game.states[curr_state].reset()
                 elif self.new_connects > 0:
                     self.game.sound_channel.play(ACHIEVEMENT_SOUND)
 
@@ -347,7 +348,7 @@ class Level:
         self.collision_point = intersect_point
         self.err_message = _("Collision")
         return True
-    
+
     def check_collision(self, start, end, startNode, endNode):
         for i in range(len(self.lines)):
             line = self.lines[i]

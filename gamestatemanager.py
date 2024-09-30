@@ -29,6 +29,6 @@ class GameStateManager():
 
     def set_state(self, state):
         self.currentState = state
-    
+
     def set_level(self, num_utils, num_houses):
         self.currentState = "level-" + str(num_utils) + "-" + str(num_houses)

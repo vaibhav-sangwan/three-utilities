@@ -30,8 +30,12 @@ class Utility(pygame.sprite.Sprite):
         super().__init__()
         self.type = type
         self.color = color
-        self.inactive_img = pygame.image.load('./assets/images/' + self.type + '.png')
-        self.active_img = pygame.image.load('./assets/images/' + self.type + '-active.png')
+        self.inactive_img = pygame.image.load(
+            './assets/images/' + self.type + '.png'
+        )
+        self.active_img = pygame.image.load(
+            './assets/images/' + self.type + '-active.png'
+        )
         self.image = self.inactive_img
         self.rect = self.image.get_rect(center=(x, y))
         self.active = False

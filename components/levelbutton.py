@@ -36,13 +36,17 @@ class LevelButton(pygame.sprite.Sprite):
         self.images = []
         for state in self.states:
             image_pair = []
-            image_pair.append(pygame.image.load("./assets/images/" + state + ".png"))
-            image_pair.append(pygame.image.load("./assets/images/" + state + "-active.png"))
+            image_pair.append(
+                pygame.image.load("./assets/images/" + state + ".png")
+            )
+            image_pair.append(
+                pygame.image.load("./assets/images/" + state + "-active.png")
+            )
             self.images.append(image_pair)
         self.state = [0, 0]
         self.image = self.images[self.state[0]][self.state[1]]
         self.rect = self.image.get_rect(center=(x, y))
-    
+
     def reset(self):
         self.state = [0, 0]
 
@@ -63,7 +67,7 @@ class LevelButton(pygame.sprite.Sprite):
     def toggle_state(self):
         self.state[0] += 1
         self.state[0] %= len(self.states)
-    
+
     def draw(self, screen):
         screen.blit(self.image, self.rect)
         if self.state[1] == 1:

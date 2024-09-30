@@ -51,7 +51,7 @@ class ThreeUtilities:
 
     def fill_bg(self):
         self.render_screen.fill("white")
-    
+
     def toggle_mute(self):
         self.mute = not self.mute
         self.sound_channel.set_volume(0 if self.mute else 1)
@@ -77,8 +77,8 @@ class ThreeUtilities:
         self.states["help-menu"] = HelpMenu(self)
         for i in range(1, 4):
             for j in range(i, 4):
-                self.states["level-" + str(i) + "-" + str(j)] = Level(self, i, j)
-
+                level = "level-" + str(i) + "-" + str(j)
+                self.states[level] = Level(self, i, j)
 
         self.is_running = True
         while self.is_running:

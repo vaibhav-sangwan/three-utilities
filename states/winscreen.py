@@ -33,24 +33,26 @@ class WinScreen:
 
         self.bound = pygame.image.load("./assets/images/bound.png")
         self.bound_rect = self.bound.get_rect(center=(
-            self.screen.get_width()/2,
-            self.screen.get_height()/2
+            self.screen.get_width() / 2,
+            self.screen.get_height() / 2
         ))
 
         self.win_img = pygame.image.load("./assets/images/util-win.png")
         self.win_img_rect = self.win_img.get_rect(center=(
-            self.screen.get_width()/2,
-            self.screen.get_height()/2
+            self.screen.get_width() / 2,
+            self.screen.get_height() / 2
         ))
 
-        self.res_button = LevelButton(685, 570, ["restart"], [_("Restart Game")])
+        self.res_button = LevelButton(
+            685, 570, ["restart"], [_("Restart Game")]
+        )
         self.home_button = LevelButton(
             725,
             569,
             ['home-button'],
             [_("Main Menu")]
         )
-        self.buttons = [self.res_button, self.home_button]  
+        self.buttons = [self.res_button, self.home_button]
 
     def reset(self):
         pass

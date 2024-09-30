@@ -32,6 +32,7 @@ GRID_HOR_SPACE = 80
 GRID_VER_SPACE = 60
 GRID_COLOR = (0, 0, 0, 64)
 
+
 class MainMenu:
     def __init__(self, game):
         self.screen = game.screen
@@ -42,21 +43,33 @@ class MainMenu:
         for i in range(11):
             curr = [False for j in range(11)]
             self.grid.append(curr)
-        
+
         self.lines = []
         self.bg = pygame.image.load("./assets/images/main-menu-bg.png")
-        self.bg_rect = self.bg.get_rect(center=(self.screen.get_width()/2, self.screen.get_height()/2))
+        self.bg_rect = self.bg.get_rect(
+            center=(self.screen.get_width() / 2, self.screen.get_height() / 2)
+        )
 
         self.logo = pygame.image.load("./assets/images/logo.png")
         self.logo_rect = self.logo.get_rect(center=(400, 120))
 
-        self.play_button = MenuButton(400, 290, "./assets/images/play-button-active.png", "./assets/images/play-button.png")
-        self.help_button = MenuButton(400, 410, "./assets/images/help-button-active.png", "./assets/images/help-button.png")
-        
+        self.play_button = MenuButton(
+            400,
+            290,
+            "./assets/images/play-button-active.png",
+            "./assets/images/play-button.png"
+        )
+        self.help_button = MenuButton(
+            400,
+            410,
+            "./assets/images/help-button-active.png",
+            "./assets/images/help-button.png"
+        )
+
     def emit_line(self):
         si = random.randint(1, 9)
         sj = random.randint(1, 9)
-        
+
         # 0 is added twice to make the probabilty of
         # moving in vertical direction equal to that of
         # moving in horizontal direction
@@ -65,7 +78,7 @@ class MainMenu:
             dy = random.choice([-1, 1])
         else:
             dy = 0
-        
+
         ei = si + dx
         ej = sj + dy
         color = random.choice(["red", "green", "blue"])
@@ -92,10 +105,10 @@ class MainMenu:
             )
         else:
             self.emit_line()
-    
+
     def dist(self, start, end):
         return math.sqrt((start[0] - end[0]) ** 2 + (start[1] - end[1]) ** 2)
-    
+
     def update_lines(self):
         i = 0
         while i < (len(self.lines)):
@@ -104,9 +117,9 @@ class MainMenu:
                 self.lines.pop(i)
                 self.grid[line["sindex"][0]][line["sindex"][1]] = False
                 self.grid[line["eindex"][0]][line["eindex"][1]] = False
-                
-            
-            if self.dist(line["orig"], line["term"]) < LINE_LENGTH and line["orig"] == line["start"]:
+
+            dist = self.dist(line["orig"], line["term"])
+            if dist < LINE_LENGTH and line["orig"] == line["start"]:
                 line["term"][0] += line["dx"]
                 line["term"][1] += line["dy"]
             elif line["term"] == line["end"]:
@@ -117,7 +130,7 @@ class MainMenu:
                 line["orig"][1] += line["dy"]
                 line["term"][0] += line["dx"]
                 line["term"][1] += line["dy"]
-            
+
             i += 1
 
     def handle_event(self, event):
@@ -131,17 +144,38 @@ class MainMenu:
     def render(self):
         self.screen.fill("white")
         for i in range(11):
-            pygame.draw.line(self.screen, GRID_COLOR, (i * GRID_HOR_SPACE, 0), (i * GRID_HOR_SPACE, 600))
-            pygame.draw.line(self.screen, GRID_COLOR, (0, i * GRID_VER_SPACE), (800, i * GRID_VER_SPACE))
+            pygame.draw.line(
+                self.screen,
+                GRID_COLOR,
+                (i * GRID_HOR_SPACE, 0),
+                (i * GRID_HOR_SPACE, 600)
+            )
+            pygame.draw.line(
+                self.screen,
+                GRID_COLOR,
+                (0, i * GRID_VER_SPACE),
+                (800, i * GRID_VER_SPACE)
+            )
 
         for i in range(1, 10):
             for j in range(1, 10):
-                pygame.draw.circle(self.screen, GRID_COLOR, (i * GRID_HOR_SPACE, j * GRID_VER_SPACE), 3)
+                pygame.draw.circle(
+                    self.screen,
+                    GRID_COLOR,
+                    (i * GRID_HOR_SPACE, j * GRID_VER_SPACE),
+                    3
+                )
         for line in self.lines:
-            pygame.draw.line(self.screen, line["color"], line["orig"], line["term"], 1)
+            pygame.draw.line(
+                self.screen,
+                line["color"],
+                line["orig"],
+                line["term"],
+                1
+            )
             if line["term"] == line["end"]:
                 pygame.draw.circle(self.screen, line["color"], line["end"], 3)
-        
+
         self.screen.blit(self.bg, self.bg_rect)
         self.screen.blit(self.logo, self.logo_rect)
         self.screen.blit(self.play_button.image, self.play_button.rect)

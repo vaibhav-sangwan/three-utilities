@@ -25,8 +25,10 @@ import pygame
 
 BASE_RES = 800, 600
 
+
 def dist(start, end):
     return math.hypot(start[0] - end[0], start[1] - end[1])
+
 
 def lineLineIntersect(P0, P1, Q0, Q1):
     dx = (P1[0] - P0[0]) * (Q1[1] - Q0[1])
@@ -46,11 +48,11 @@ def lineLineIntersect(P0, P1, Q0, Q1):
         )
     return None
 
+
 def segment_intersect(line1, line2):
-    intersection_pt = lineLineIntersect(line1[0],
-                                             line1[1],
-                                             line2[0],
-                                             line2[1])
+    intersection_pt = lineLineIntersect(
+        line1[0], line1[1], line2[0], line2[1]
+    )
     if not intersection_pt:
         return None
     minm = min(line1[0][0], line1[1][0])

@@ -28,11 +28,15 @@ from utils import Utils
 class BackButton(pygame.sprite.Sprite):
     def __init__(self, x, y):
         super().__init__()
-        self.inactive_img = pygame.image.load('./assets/images/back-button.png')
-        self.active_img = pygame.image.load('./assets/images/back-button-active.png')
+        self.inactive_img = pygame.image.load(
+            './assets/images/back-button.png'
+        )
+        self.active_img = pygame.image.load(
+            './assets/images/back-button-active.png'
+        )
         self.image = self.inactive_img
         self.rect = self.image.get_rect(center=(x, y))
-        
+
     def check_press(self):
         if self.rect.collidepoint(Utils.norm_cursor_pos()):
             return True

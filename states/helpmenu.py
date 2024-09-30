@@ -52,11 +52,13 @@ class HelpMenu:
         self.game = game
         self.bg = pygame.image.load("./assets/images/bound.png")
         self.bg_rect = self.bg.get_rect(center=(
-            self.screen.get_width()/2,
-            self.screen.get_height()/2
+            self.screen.get_width() / 2,
+            self.screen.get_height() / 2
         ))
         self.title = font_l.render("HELP", False, "black")
-        self.title_rect = self.title.get_rect(center = (self.screen.get_width()/2, 40))
+        self.title_rect = self.title.get_rect(
+            center=(self.screen.get_width() / 2, 40)
+        )
         self.backbtn = BackButton(750, 550)
         self.page = 0
         self.refresh_page()
